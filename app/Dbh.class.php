@@ -6,7 +6,7 @@ class Dbh {
     private $host = "localhost";
     private $username = "root";
     private $password = "";
-    private $database = "test";
+    private $database = "m_sys";
 
     protected function dbConnect()
     {

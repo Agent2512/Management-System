@@ -7,6 +7,9 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>test</h1>
+    <h1>test php</h1>
 </body>
 </html>
+<?php
+include "inc/autoloader.inc.php";
+var_dump((new Users())->getUser("2"));

@@ -7,8 +7,8 @@ function myAutoloader($className)
 
     $dirs = [
         "",
-        "modules/",
-        "views/",
+        "module/",
+        "view/",
         "controller/",
     ];
 
