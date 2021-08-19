@@ -1,3 +1,9 @@
+<?php
+include "inc/autoloader.inc.php";
+
+(new UserControl)->isLoggedIn();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,5 +16,3 @@
     <h1>test php 19-08-2021</h1>
 </body>
 </html>
-<?php
-include "inc/autoloader.inc.php";

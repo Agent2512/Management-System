@@ -2,7 +2,7 @@
 spl_autoload_register("myAutoloader");
 function myAutoloader($className)
 {
-    $path = "app/";
+    $path = "./app/";
     $ext = ".class.php";
 
     $dirs = [

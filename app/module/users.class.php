@@ -37,7 +37,7 @@ class Users extends Dbh
      * update user data on the database
      * @param String $user_id
      * @param Object $userObj
-     * @return Boolean
+     * @return Bool
      */
     public function updataUser(string $user_id, Object $userObj)
     {
@@ -94,13 +94,5 @@ class Users extends Dbh
         return $this->dbConnect()->query($sql)->fetch();
     }
 
-    private function encryptPass(String $normalValue)
-    {
-        return password_hash($normalValue, PASSWORD_DEFAULT);
-    }
-
-    private function decryptPass(String $normalValue, String $hashed_password)
-    {
-        return password_verify($normalValue, $hashed_password);
-    }
+    
 }
