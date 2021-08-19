@@ -51,7 +51,7 @@ class Users extends Dbh
             WHERE id = $user_id
         ";
 
-        return $this->dbConnect()->query($sql)?true:false;
+        return $this->dbConnect()->query($sql) ? true : false;
     }
 
     /**
@@ -62,10 +62,10 @@ class Users extends Dbh
     {
         $sql = "SELECT * FROM `sys_user`";
 
-        if ($limit!=0) {
+        if ($limit != 0) {
             $sql .= "LIMIT $limit";
         }
-        if ($offset!=0) {
+        if ($offset != 0) {
             $sql .= "OFFSET $offset";
         }
 
@@ -92,5 +92,15 @@ class Users extends Dbh
     {
         $sql = "SELECT * FROM `sys_user` WHERE user_email = '$email'";
         return $this->dbConnect()->query($sql)->fetch();
+    }
+
+    private function encryptPass(String $normalValue)
+    {
+        return password_hash($normalValue, PASSWORD_DEFAULT);
+    }
+
+    private function decryptPass(String $normalValue, String $hashed_password)
+    {
+        return password_verify($normalValue, $hashed_password);
     }
 }
