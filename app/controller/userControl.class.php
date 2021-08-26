@@ -22,20 +22,82 @@ class UserControl extends Users
 
     /**
      * login function
-     * makes a user Object in session
-     *
+     * makes a userArr in session
+     *  sends user to index page 
+     * 
      * @param String $email
      * @param String $password
      * @return void
      */
     public function login(String $email, String $password)
     {
+        // validates user input
         if ($this->validateEmail($email) && $this->validatePassword($password)) {
-            # code...
+            // gets user from the database
+            $user = $this->checkUser($email);
+
+            if ($user) {
+                // user is deactive, return
+                if ($user->login_attempts == 6) {
+                    return "user is deactive";
+                }
+
+                // if user password is correct send user to index page, return
+                if ($this->decryptPass($password, $user->user_pass)) {
+                    $user->login_attempts != 0 && $this->setloginAttempts($user->id, 0);
+
+                    $this->makeUserArr($user);
+
+                    header("location: index.php");
+                    return;
+                }
+
+
+                // ad one to the login attempt in the database
+                $new_login_attempts = $user->login_attempts + 1;
+                $this->setloginAttempts($user->id, $new_login_attempts);
+
+                // if login attempts has reached 6 send email to user 
+                if ($new_login_attempts == 6) {
+                    $token = md5($user->id . date("Y-m-dH:i:s"));
+                    $this->addPasswordResetToken($user->id, $token);
+                    // mail($user->user_email, "Management-System reset password", "http://localhost/code/Management-System/reset.php?token=$token");
+                }
+            }
+
+
+            return "worng email or password";
         }
+        return "invalid email or password";
     }
 
 
+    /**
+     * unsets userArr in session
+     *
+     * @return void
+     */
+    public function logOut()
+    {
+        unset($_SESSION["user"]);
+        return header("location: index.php");
+    }
+
+    /**
+     * sets a userArr in session
+     *
+     * @param Object $user
+     * @return void
+     */
+    private function makeUserArr(Object $user)
+    {
+        $userArr = array();
+        $userArr["id"] = $user->id;
+        $userArr["email"] = $user->user_email;
+        $userArr["username"] = $user->username;
+
+        $_SESSION["user"] = $userArr;
+    }
 
     /**
      * takes a password and validates it
@@ -56,7 +118,6 @@ class UserControl extends Users
         } else {
             // echo "Your password is strong.";
             return true;
-
         }
     }
 
@@ -93,5 +154,29 @@ class UserControl extends Users
     private function decryptPass(String $normalValue, String $hashed_password)
     {
         return password_verify($normalValue, $hashed_password);
+    }
+
+
+    /**
+     * Undocumented function
+     *
+     * @param String $token
+     * @return void
+     */
+    public function validateToken(String $token)
+    {
+        $dataToken = $this->getPasswordResetToken($token);
+
+        if ($dataToken) {
+            $requested_time = new DateTime($dataToken->requested_time);
+            $time = new DateTime();
+            var_dump(date_diff($requested_time, $time));
+        }
+    }
+
+
+    public function test($var)
+    {
+        return $this->encryptPass($var);
     }
 }

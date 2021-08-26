@@ -1,13 +1,11 @@
 <?php
 include "inc/autoloader.inc.php";
-$msg = "";
 
-if (count($_POST)) {
-    // var_dump($_POST);
-    $msg = (new UserControl)->login($_POST["email"], $_POST["password"]);
+if (count($_GET) && isset($_GET['token'])) {
+    // var_dump($_GET);
+    (new UserControl)->validateToken($_GET['token']);
 }
-
-print $msg;
+// else header("location: index.php");
 
 ?>
 
@@ -84,18 +82,14 @@ print $msg;
 
     <main class="form-signin">
         <form action="<?= $_SERVER['PHP_SELF']; ?>" method="POST">
-            <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+            <h1 class="h3 mb-3 fw-normal">New Password</h1>
 
-            <div class="form-floating">
-                <input type="email" name="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-                <label for="floatingInput">Email address</label>
-            </div>
             <div class="form-floating">
                 <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password">
                 <label for="floatingPassword">Password</label>
             </div>
 
-            <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+            <button class="w-100 btn btn-lg btn-primary" type="submit">Reset Password</button>
             <p class="mt-5 mb-3 text-muted">Management System &copy;2021</p>
         </form>
     </main>

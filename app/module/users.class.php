@@ -36,18 +36,18 @@ class Users extends Dbh
     /**
      * update user data on the database
      * @param String $user_id
-     * @param Object $userObj
+     * @param Object $userArr
      * @return Bool
      */
-    public function updataUser(string $user_id, Object $userObj)
+    public function updataUser(string $user_id, Object $userArr)
     {
         $sql = "
         UPDATE `sys_user` SET 
-            username = '$userObj->username',
-            user_pass = '$userObj->pass',
-            user_email = '$userObj->email',
-            password_set = '$userObj->password_set',
-            user_role = '$userObj->user_role' 
+            username = '$userArr[´username´]',
+            user_pass = '$userArr[´pass´]',
+            user_email = '$userArr[´email´]',
+            password_set = '$userArr[´password_set´]',
+            user_role = '$userArr[´user_role´]' 
             WHERE id = $user_id
         ";
 
@@ -94,5 +94,47 @@ class Users extends Dbh
         return $this->dbConnect()->query($sql)->fetch();
     }
 
+    /**
+     * sets the users login attempts to $num value
+     *
+     * @param Int $user_id what user to change 
+     * @param Int $num number to set
+     * @return void
+     */
+    public function setloginAttempts(Int $user_id, Int $num)
+    {
+
+        $sql = "UPDATE `sys_user` SET `login_attempts` = '$num' WHERE `sys_user`.`id` = $user_id";
     
+        $this->dbConnect()->query($sql);
+    }
+
+
+    // reset token stuff
+
+
+    /**
+     * adds a reset_password_token to the database  
+     *
+     * @param Int $user_id the id of the user to reset
+     * @param String $token 
+     * @return void
+     */
+    public function addPasswordResetToken(Int $user_id, String $token)
+    {
+        $sql = "INSERT INTO `reset_password_token` (`user_id`, `requested_time`, `token`) VALUES ('$user_id', current_timestamp(), '$token');";
+        return $this->dbConnect()->query($sql);
+    }
+    
+    /**
+     * gets a token from the database
+     *
+     * @param String $token
+     * @return Object|false
+     */
+    public function getPasswordResetToken(String $token)
+    {
+        $sql = "SELECT * FROM `reset_password_token` WHERE token = '$token'";
+        return $this->dbConnect()->query($sql)->fetch();
+    }
 }
