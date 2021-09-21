@@ -60,7 +60,7 @@ class UserControl extends Users
                 // if login attempts has reached 6 send email to user 
                 if ($new_login_attempts == 6) {
                     $token = md5($user->id . date("Y-m-dH:i:s"));
-                    $this->addPasswordResetToken($user->id, $token);
+                    $this->addResetToken($user->id, $token);
                     // mail($user->user_email, "Management-System reset password", "http://localhost/code/Management-System/reset.php?token=$token");
                 }
             }
@@ -95,6 +95,7 @@ class UserControl extends Users
         $userArr["id"] = $user->id;
         $userArr["email"] = $user->user_email;
         $userArr["username"] = $user->username;
+        $userArr["role"] = $user->user_role;
 
         $_SESSION["user"] = $userArr;
     }
@@ -165,12 +166,36 @@ class UserControl extends Users
      */
     public function validateToken(String $token)
     {
-        $dataToken = $this->getPasswordResetToken($token);
-
+        
+        $dataToken = $this->getResetToken($token);
+        
         if ($dataToken) {
+            // is the token still active?
+            if ($dataToken->active == 0) {
+                // token is not active
+                return "token is not active";
+            }
+
+            // is the token to old
             $requested_time = new DateTime($dataToken->requested_time);
             $time = new DateTime();
-            var_dump(date_diff($requested_time, $time));
+
+            if (date_diff($requested_time, $time)->d >= 1) {
+                // token is to old 
+                // disable old token 
+                $this->setResetToken_active($dataToken->id, 0);
+                // send new mail
+                $token = md5($dataToken->user_id . date("Y-m-dH:i:s"));
+                // mail($user->user_email, "Management-System reset password", "http://localhost/code/Management-System/reset.php?token=$token");
+                // make new token
+                $this->addResetToken($dataToken->user_id, $token);
+
+                return "token is to old";
+            }
+
+        }
+        else {
+            die("error invalid token");
         }
     }
 

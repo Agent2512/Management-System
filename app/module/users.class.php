@@ -1,3 +1,4 @@
+
 <?php
 class Users extends Dbh
 {
@@ -25,7 +26,7 @@ class Users extends Dbh
      * delete a user from the database
      * @param String $user_id
      */
-    public function deleteUser($user_id)
+    public function deleteUser($user_id): bool
     {
         $sql = "DELETE FROM `sys_user` WHERE `sys_user`.`id` = ?";
         $stmt = $this->dbConnect()->prepare($sql);
@@ -120,7 +121,7 @@ class Users extends Dbh
      * @param String $token 
      * @return void
      */
-    public function addPasswordResetToken(Int $user_id, String $token)
+    public function addResetToken(Int $user_id, String $token)
     {
         $sql = "INSERT INTO `reset_password_token` (`user_id`, `requested_time`, `token`) VALUES ('$user_id', current_timestamp(), '$token');";
         return $this->dbConnect()->query($sql);
@@ -132,9 +133,14 @@ class Users extends Dbh
      * @param String $token
      * @return Object|false
      */
-    public function getPasswordResetToken(String $token)
+    public function getResetToken(String $token)
     {
         $sql = "SELECT * FROM `reset_password_token` WHERE token = '$token'";
         return $this->dbConnect()->query($sql)->fetch();
+    }
+
+    public function setResetToken_active(String $token_id, String $value) {
+        $sql = "UPDATE `reset_password_token` SET `active` = '$value' WHERE `reset_password_token`.`id` = $token_id";
+        return $this->dbConnect()->query($sql);
     }
 }

@@ -1,9 +1,11 @@
 <?php
 include "inc/autoloader.inc.php";
-
-if (count($_GET) && isset($_GET['token'])) {
-    // var_dump($_GET);
-    (new UserControl)->validateToken($_GET['token']);
+$tokenErr;
+if (count($_GET) && isset($_GET['token']) && $_GET['token'] != "") {
+    $tokenErr = (new UserControl)->validateToken($_GET['token']);
+}
+else {
+    die("error invalid token");
 }
 // else header("location: index.php");
 
@@ -88,6 +90,12 @@ if (count($_GET) && isset($_GET['token'])) {
                 <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password">
                 <label for="floatingPassword">Password</label>
             </div>
+
+            <?php if ($tokenErr) : ?>
+                <div class="err">
+                    <p><?= $tokenErr ?></p>
+                </div>
+            <?php endif ?>
 
             <button class="w-100 btn btn-lg btn-primary" type="submit">Reset Password</button>
             <p class="mt-5 mb-3 text-muted">Management System &copy;2021</p>

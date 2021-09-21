@@ -4,6 +4,15 @@ include "inc/autoloader.inc.php";
 $userControl = new UserControl();
 $userControl->isLoggedIn();
 
+if (!isset($_SESSION)) {
+    session_start();
+}
+
+if (isset($_SESSION["user"]) == false || $_SESSION["user"]["role"] == "general_user") {
+    header("Location: ./index.php");
+}
+
+
 ?>
 
 
@@ -40,11 +49,9 @@ $userControl->isLoggedIn();
 
     <?php require_once "./app/view/components/navbarTop.php" ?>
 
-
     <div class="container-fluid">
         <div class="row">
             <?php require_once "./app/view/components/sidebarMenu.php" ?>
-
 
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -52,8 +59,39 @@ $userControl->isLoggedIn();
 
                 </div>
 
-                <h2>You are now logged in to Management System &#x1F44D;</h2>
+                <h2>Users</h2>
 
+                <a href="create_user.php" class="btn btn-info">Create new User</a>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">id</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Registered</th>
+                                <th scope="col">Role</th>
+                                <th scope="col">Function</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            foreach ($userControl->getAllUsers() as $user) {
+                                $id = $user->id;
+                                $username = $user->username;
+                                $email = $user->user_email;
+                                $date = $user->user_registered;
+                                $role = $user->user_role;
+                                $login_attempts = $user->login_attempts;
+
+                                require "./app/view/components/user/showUser_inRow.php";
+                            }
+
+
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
             </main>
 
         </div>
@@ -115,6 +153,10 @@ $userControl->isLoggedIn();
                     e.preventDefault();
 
                     let deleteprompt = confirm("Are you sure you wish to delete this user?");
+
+                    if (deleteprompt) {
+                        location.assign(e.currentTarget.href)
+                    }
 
                 });
 

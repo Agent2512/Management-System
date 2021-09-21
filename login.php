@@ -1,13 +1,13 @@
 <?php
 include "inc/autoloader.inc.php";
-$msg = "";
+$loginErr = "";
 
-if (count($_POST)) {
+if (count($_POST) == 2 && isset($_POST["email"]) && isset($_POST["password"])) {
     // var_dump($_POST);
-    $msg = (new UserControl)->login($_POST["email"], $_POST["password"]);
+    $loginErr = (new UserControl)->login($_POST["email"], $_POST["password"]);
 }
 
-print $msg;
+// print $loginErr;
 
 ?>
 
@@ -77,6 +77,17 @@ print $msg;
             border-top-left-radius: 0;
             border-top-right-radius: 0;
         }
+
+        .err {
+            background-color: #f00;
+            border-radius: 3px;
+        }
+
+        .err>p {
+            color: #000;
+            font-size: 1.3rem;
+            font-weight: 500;
+        }
     </style>
 </head>
 
@@ -95,6 +106,12 @@ print $msg;
                 <label for="floatingPassword">Password</label>
             </div>
 
+            <?php if ($loginErr) : ?>
+                <div class="err">
+                    <p><?= $loginErr ?></p>
+                </div>
+            <?php endif ?>
+            
             <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
             <p class="mt-5 mb-3 text-muted">Management System &copy;2021</p>
         </form>
