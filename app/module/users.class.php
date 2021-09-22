@@ -26,7 +26,7 @@ class Users extends Dbh
      * delete a user from the database
      * @param String $user_id
      */
-    public function deleteUser($user_id): bool
+    public function deleteUser($user_id)
     {
         $sql = "DELETE FROM `sys_user` WHERE `sys_user`.`id` = ?";
         $stmt = $this->dbConnect()->prepare($sql);

@@ -199,6 +199,15 @@ class UserControl extends Users
         }
     }
 
+    /**
+     * delete a user from the database
+     * but not superAdmin
+     * @param String $user_id
+     */
+    public function removeUser($user_id) {
+        
+    }
+
 
     public function test($var)
     {
