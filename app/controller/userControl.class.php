@@ -166,9 +166,9 @@ class UserControl extends Users
      */
     public function validateToken(String $token)
     {
-        
+
         $dataToken = $this->getResetToken($token);
-        
+
         if ($dataToken) {
             // is the token still active?
             if ($dataToken->active == 0) {
@@ -192,9 +192,7 @@ class UserControl extends Users
 
                 return "token is to old";
             }
-
-        }
-        else {
+        } else {
             die("error invalid token");
         }
     }
@@ -204,8 +202,13 @@ class UserControl extends Users
      * but not superAdmin
      * @param String $user_id
      */
-    public function removeUser($user_id) {
-        
+    public function removeUser($user_id)
+    {
+        $user = $this->getUser($user_id);
+
+        if ($user && $user->user_role != "SuperAdmin") {
+            $this->deleteUser($user_id);
+        }
     }
 
 
