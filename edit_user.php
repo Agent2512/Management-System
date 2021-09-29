@@ -12,18 +12,24 @@ if (isset($_SESSION["user"]) == false || $_SESSION["user"]["role"] != "SuperAdmi
     header("Location: ./users.php");
 }
 
+
+// handle POST form data
+if (count($_POST) >= 4 && isset($_POST["id"]) && $_POST["id"] != "") {
+
+    if (isset($_POST["password"], $_POST["password2"], $_POST["username"]) && $_POST["password"] == $_POST["password2"] && $_POST["username"] != "") {
+
+        $userControl->editUser($_POST["id"], $_POST["username"], $_POST["password"], isset($_POST["sendEmail"]));
+    }
+}
+
 // user object 
 $editUser;
 
 // get get user from database
 // or go´s the users page
-if (isset($_GET["user_id"]) && $_GET["user_id"] != "" && $editUser = $userControl->getUser($_GET["user_id"])) {} else {
+if (isset($_GET["user_id"]) && $_GET["user_id"] != "" && $editUser = $userControl->getUser($_GET["user_id"])) {
+} else {
     header("Location: ./users.php");
-}
-
-// handle POST form
-if (count($_POST) >= 4) {
-    var_dump($_POST);
 }
 
 ?>
@@ -61,18 +67,18 @@ if (count($_POST) >= 4) {
 
                                 <div class="form-group">
                                     <label for="id">id</label>
-                                    <input name="id" class="form-control mx-sm-6" type="text" id="id" value=<?= $editUser->id ?>  readonly required >
+                                    <input name="id" class="form-control mx-sm-6" type="text" id="id" value=<?= $editUser->id ?> readonly required>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="user_name">User name</label>
-                                    <input name="username" type="text" class="form-control" id="user_name" aria-describedby="User name" required value=<?= $editUser->username ?> >
+                                    <input name="username" type="text" class="form-control" id="user_name" aria-describedby="User name" value="<?= $editUser->username  ?>">
                                     <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="createPassword">Password</label>
-                                    <input name="password" type="password" class="form-control" id="createPassword" placeholder="Password" required >
+                                    <input name="password" type="password" class="form-control" id="createPassword" placeholder="Password">
                                     <br>
                                     <span id="password-test-msg"></span>
 
@@ -80,13 +86,13 @@ if (count($_POST) >= 4) {
 
                                 <div class="form-group">
                                     <label for="createPassword2">gentag Password</label>
-                                    <input name="password2" type="password" class="form-control" id="createPassword2" placeholder="Password" required >
+                                    <input name="password2" type="password" class="form-control" id="createPassword2" placeholder="Password">
                                     <p>(skal kun ændres, hvis nyt password sættes)</p>
                                 </div>
 
                                 <div class="form-check">
-                                    <input name="sendEmail" type="checkbox" class="form-check-input" id="exampleCheck1">
-                                    <label class="form-check-label" for="exampleCheck1">Send nyt password til brugeren</label>
+                                    <input name="sendEmail" type="checkbox" class="form-check-input" id="sendEmail">
+                                    <label class="form-check-label" for="sendEmail">Send nyt password til brugeren</label>
                                     <p>(Hvis bruger ændrer eget password skal der sendes en mail til brugeren om, at password er skiftet)</p>
                                 </div>
 

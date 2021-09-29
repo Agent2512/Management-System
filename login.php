@@ -2,6 +2,7 @@
 include "inc/autoloader.inc.php";
 $loginErr = "";
 
+// handle form 
 if (count($_POST) == 2 && isset($_POST["email"]) && isset($_POST["password"])) {
     // var_dump($_POST);
     $loginErr = (new UserControl)->login($_POST["email"], $_POST["password"]);

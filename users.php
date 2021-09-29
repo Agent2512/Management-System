@@ -7,7 +7,7 @@ $userControl->isLoggedIn();
 if (!isset($_SESSION)) {
     session_start();
 }
-
+// page auth
 if (isset($_SESSION["user"]) == false || $_SESSION["user"]["role"] == "general_user") {
     header("Location: ./index.php");
 }

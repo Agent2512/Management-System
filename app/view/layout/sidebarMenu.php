@@ -17,7 +17,7 @@ if (!isset($_SESSION)) {
 
         </ul>
 
-        <?php if (isset($_SESSION["user"]) && $_SESSION["user"]["role"] != "general_use") : ?>
+        <?php if (isset($_SESSION["user"]) && $_SESSION["user"]["role"] != "general_user") : ?>
             <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                 <span>Admin</span>
                 <a class="link-secondary" href="#" aria-label="Admin">

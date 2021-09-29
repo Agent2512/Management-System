@@ -37,15 +37,15 @@ class Users extends Dbh
     /**
      * update user data on the database
      * @param String $user_id
-     * @param Object $userArr
+     * @param String[] $userArr
      * @return Bool
      */
-    public function updataUser(string $user_id, Object $userArr)
+    public function updateUser(string $user_id, $userArr)
     {
         $sql = "
         UPDATE `sys_user` SET 
             username = '$userArr[´username´]',
-            user_pass = '$userArr[´pass´]',
+            user_pass = '$userArr[´password´]',
             user_email = '$userArr[´email´]',
             password_set = '$userArr[´password_set´]',
             user_role = '$userArr[´user_role´]' 
@@ -106,9 +106,45 @@ class Users extends Dbh
     {
 
         $sql = "UPDATE `sys_user` SET `login_attempts` = '$num' WHERE `sys_user`.`id` = $user_id";
-    
+
         $this->dbConnect()->query($sql);
     }
+
+    /**
+     * set a users password to $password
+     * @param String $user_id
+     * @param String $password
+     * @return Bool
+     */
+    public function setPassword(String $user_id, String $password)
+    {
+        $sql = "UPDATE `sys_user` SET `user_pass` = '$password', `password_set` = current_timestamp() WHERE `sys_user`.`id` = $user_id";
+        return $this->dbConnect()->query($sql) ? true : false;
+    }
+
+    /**
+     * set a users username to $username
+     * @param String $user_id
+     * @param String $username
+     * @return Bool
+     */
+        public function setUsername(String $user_id, String $username)
+    {
+        $sql = "UPDATE `sys_user` SET `username` = '$username' WHERE `sys_user`.`id` = $user_id";
+        return $this->dbConnect()->query($sql) ? true : false;
+    }   
+
+    /**
+     * set a users email to $email
+     * @param String $user_id
+     * @param String $email
+     * @return Bool
+     */
+    public function setEmail(String $user_id, String $email) {
+        $sql = "UPDATE `sys_user` SET `user_email` = '$email' WHERE `sys_user`.`id` = $user_id";
+        return $this->dbConnect()->query($sql) ? true : false;
+    }
+
 
 
     // reset token stuff
@@ -126,7 +162,7 @@ class Users extends Dbh
         $sql = "INSERT INTO `reset_password_token` (`user_id`, `requested_time`, `token`) VALUES ('$user_id', current_timestamp(), '$token');";
         return $this->dbConnect()->query($sql);
     }
-    
+
     /**
      * gets a token from the database
      *
@@ -139,7 +175,8 @@ class Users extends Dbh
         return $this->dbConnect()->query($sql)->fetch();
     }
 
-    public function setResetToken_active(String $token_id, String $value) {
+    public function setResetToken_active(String $token_id, String $value)
+    {
         $sql = "UPDATE `reset_password_token` SET `active` = '$value' WHERE `reset_password_token`.`id` = $token_id";
         return $this->dbConnect()->query($sql);
     }

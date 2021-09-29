@@ -57,6 +57,10 @@
 
                 let deleteprompt = confirm("Are you sure you wish to delete this user?");
 
+                if (deleteprompt) {
+                    window.location.href = $(this).attr("href");
+                }
+
             });
 
 

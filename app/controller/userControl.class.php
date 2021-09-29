@@ -9,6 +9,49 @@ class UserControl extends Users
     }
 
     /**
+     * make a new user account and save it to the database 
+     * @param  string $username
+     * @param  string $password
+     * @param  string $email
+     * @param  boolean $sendEmail
+     */
+    public function makeNewUser($username, $password, $email, $sendEmail)
+    {
+        // validate password
+        if ($this->validatePassword($password) == false) {
+            return "Password must be at least 8 characters long and contain at least one number and one letter and least one special character";
+        }
+        // validate email
+        if ($this->validateEmail($email) == false) {
+            return "Invalid email address";
+        }
+        // validate username is not empty
+        if (str_replace(' ', '', $username) == '') {
+            return "Username cannot be empty";
+        }
+        // check if email already in use by another user 
+        if ($this->checkUser($email)) {
+            return "Email address already in use";
+        }
+
+        // hash password
+        $hashedPassword = $this->encryptPass($password);
+
+        // create new user
+        if ($this->createUser($username, $hashedPassword, $email)) {
+            // send email
+            if ($sendEmail) {
+                // mail($email, "Welcome to the site", "You have successfully created an account on the site you pasword is: $password");
+            }
+
+            header("Location: users.php");
+        } else {
+            return "Error creating user";
+        }
+    }
+
+
+    /**
      *  check if user is logged in 
      *  else sends dem to the login page 
      */
@@ -32,7 +75,7 @@ class UserControl extends Users
     public function login(String $email, String $password)
     {
         // validates user input
-        if ($this->validateEmail($email) && $this->validatePassword($password)) {
+        if ($this->validateEmail($email)) {
             // gets user from the database
             $user = $this->checkUser($email);
 
@@ -43,7 +86,7 @@ class UserControl extends Users
                 }
 
                 // if user password is correct send user to index page, return
-                if ($this->decryptPass($password, $user->user_pass)) {
+                if ($this->validatePassword($password) && $this->decryptPass($password, $user->user_pass)) {
                     $user->login_attempts != 0 && $this->setloginAttempts($user->id, 0);
 
                     $this->makeUserArr($user);
@@ -68,7 +111,7 @@ class UserControl extends Users
 
             return "worng email or password";
         }
-        return "invalid email or password";
+        return "invalid email";
     }
 
 
@@ -80,7 +123,8 @@ class UserControl extends Users
     public function logOut()
     {
         unset($_SESSION["user"]);
-        return header("location: index.php");
+        // send user to login page
+        header("location: ./login.php");
     }
 
     /**
@@ -104,7 +148,7 @@ class UserControl extends Users
      * takes a password and validates it
      *
      * @param String $password the password that the user gives
-     * @return void
+     * @return Bool
      */
     private function validatePassword(String $password)
     {
@@ -159,10 +203,10 @@ class UserControl extends Users
 
 
     /**
-     * Undocumented function
-     *
+     * validate token 
+     * if token is not valid return error
      * @param String $token
-     * @return void
+     * @return string
      */
     public function validateToken(String $token)
     {
@@ -211,9 +255,107 @@ class UserControl extends Users
         }
     }
 
+    /**
+     * edit a user on the database
+     * 
+     * @param String $user_id
+     * @param String $username
+     * @param String $password
+     * @param bool $send_email
+     * 
+     */
+    public function editUser($user_id, $username, $password, $send_email)
+    {
+        $user = $this->getUser($user_id);
+
+        if ($user) {
+            // check if the username is the same
+            if ($user->username != $username) {
+                $this->setUsername($user_id, $username);
+            }
+
+            // check if the password is valid and if the password is the same
+            // if not change the password
+            if ($password && $this->validatePassword($password) && $this->decryptPass($password, $user->user_pass) == false) {
+                $this->setPassword($user_id, $this->encryptPass($password));
+            }
+
+            // send email to user
+            if ($send_email) {
+                // mail($user->user_email, "Management-System profile changes", "username=$username  password=$password email=$user->user_email");
+            }
+        } else {
+            return "user not found";
+        }
+    }
+
+    /**
+     * edit profile of a user from the database 
+     * @param String $user_id
+     * @param String $username
+     * @param String $password
+     * @param String $email
+     * 
+     */
+    public function editProfile($user_id, $username, $password, $email)
+    {
+        $user = $this->getUser($user_id);
+
+        if ($user) {
+            // validate email 
+            if (
+                $email &&
+                $this->validateEmail($email) &&
+                $this->checkUser($email) == false
+            ) {
+
+                $this->setEmail($user_id, $email);
+            }
+
+            $this->editUser($user_id, $username, $password, true);
+
+            // if password is changed logout user
+            if ($password) {
+                header("Location: logout.php");
+            }
+        } else {
+            return "user not found";
+        }
+    }
+
+    /**
+     * handle the reset password 
+     * with a token 
+     * @param String $token
+     * @param String $password
+     */
+    public function resetPassword($token, $password)
+    {
+        // get tokenData from the database
+        $dataToken = $this->getResetToken($token);
+
+        if ($dataToken) {
+            // validate password
+            if ($this->validatePassword($password) == false) {
+                return "password is not strong";
+            }
+
+            // set new password
+            $this->setPassword($dataToken->user_id, $this->encryptPass($password));
+
+            // reset login_attempts
+            $this->setloginAttempts($dataToken->user_id, 0);
+
+            // delete token
+            $this->setResetToken_active($dataToken->id, 0);
+
+            // sends user to login page
+            header("Location: login.php");
+        }
+    }
 
     public function test($var)
     {
-        return $this->encryptPass($var);
+        return empty($var);
     }
 }
